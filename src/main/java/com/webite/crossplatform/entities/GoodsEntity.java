@@ -13,7 +13,7 @@ public class GoodsEntity {
     private String name;
     private int quantity;
     private int price;
-    private String img; // path to img
+    private byte[] img; // path to img
     private String description;
 
     public int getGoods_id() {
@@ -48,11 +48,11 @@ public class GoodsEntity {
         this.price = price;
     }
 
-    public String getImg() {
+    public byte[] getImg() {
         return img;
     }
 
-    public void setImg(String img) {
+    public void setImg(byte[] img) {
         this.img = img;
     }
 
@@ -63,4 +63,5 @@ public class GoodsEntity {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }
