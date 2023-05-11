@@ -1,5 +1,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="th" uri="http://www.thymeleaf.org" %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
@@ -36,7 +37,7 @@ pageEncoding="UTF-8"%>
 	</nav>
 	<div class="container mt-4">
 		<h1>Basket</h1>
-		<form action="MISSING_CONTROLLER" method="post">
+		<form action="basket/submit" method="post">
             <table class="table">
                 <thead>
                     <tr>
@@ -48,38 +49,43 @@ pageEncoding="UTF-8"%>
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach items="${basketItems}" var="basketItem">
+                    <c:forEach items="${orderForm.orderItems}" var="orderItem" varStatus="orderItemStat">
                         <tr>
-                            <td>${basketItem.name}</td>
+                            <td th:text="${orderItem.name}"></td>
                             <td>
-                                <input id="input-${basketItem.goods_id}" type="number" min="0" max="${basketItem.quantity}" class="quantity-input" data-goodsid="${basketItem.goods_id}" data-price="${basketItem.price}" value="0">
+                                <input id="input-${orderItem.goodsId}" type="number" min="0" max="${orderItem.quantity}" class="quantity-input" data-goodsid="${orderItem.goodsId}" data-price="${orderItem.price}" th:value="${orderItem.quantity}" th:name="orderItems[__${orderItemStat.index}__].quantity">
+                                <input type="hidden" th:name="orderItems[__${orderItemStat.index}__].goodsId" th:value="${orderItem.goodsId}">
+                                <input type="hidden" th:name="orderItems[__${orderItemStat.index}__].name" th:value="${orderItem.name}">
+                                <input type="hidden" th:name="orderItems[__${orderItemStat.index}__].price" th:value="${orderItem.price}">
                             </td>
-                            <td id="single-price-${basketItem.goods_id}" data-priceSingle="${basketItem.price}">$${basketItem.price}</td>
-                            <td id="total-price-${basketItem.goods_id}" class="total-price"></td>
-                            <td><button class="btn btn-danger remove-btn" data-goodsid="${basketItem.goods_id}">Remove</button></td>
+                            <td id="single-price-${orderItem.goodsId}" data-priceSingle="${orderItem.price}" th:text="'$' + ${orderItem.price}"></td>
+                            <td id="total-price-${orderItem.goodsId}" class="total-price" th:text="'$' + (${orderItem.price} * ${orderItem.quantity})"></td>
+                            <td>
+                                <button class="btn btn-danger remove-btn" data-goodsid="${orderItem.goodsId}">Remove</button>
+                            </td>
                         </tr>
                     </c:forEach>
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-right"><strong>Total:</strong></td>
-                        <td id="summary-price"><strong>$${totalPrice}</strong></td>
+                        <td id="summary-price" name="summaryPrice"><strong>$${totalPrice}</strong>
+                        </td>
                     </tr>
                 </tfoot>
             </table>
 
-
             <div class="form-group mt-3 mb-3">
-              <label for="payment-type">Payment Type:</label>
-              <select class="form-control" id="payment-type" name="paymentType" required>
-                <option value="">Choose payment type</option>
-                <option value="post-payment">Post-payment</option>
-                <option value="online">Online</option>
-              </select>
+                <label for="payment-type">Payment Type:</label>
+                <select class="form-control" id="payment-type" name="paymentType" required>
+                    <option value="">Choose payment type</option>
+                    <option value="post-payment">Post-payment</option>
+                    <option value="online">Online</option>
+                </select>
             </div>
             <div class="form-group mt-3 mb-3">
-              <label for="address">Delivery Address:</label>
-              <input type="text" class="form-control" id="address" name="address" required>
+                <label for="address">Delivery Address:</label>
+                <input type="text" class="form-control" id="address" name="deliveryAddress" required>
             </div>
             <button type="submit" class="btn btn-primary">Submit Order</button>
         </form>
