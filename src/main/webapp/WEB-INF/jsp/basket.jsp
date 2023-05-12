@@ -1,6 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="th" uri="http://www.thymeleaf.org" %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
@@ -37,7 +36,7 @@ pageEncoding="UTF-8"%>
 	</nav>
 	<div class="container mt-4">
 		<h1>Basket</h1>
-		<form action="basket/submit" method="post">
+		<form id="orderForm">
             <table class="table">
                 <thead>
                     <tr>
@@ -49,51 +48,79 @@ pageEncoding="UTF-8"%>
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach items="${orderForm.orderItems}" var="orderItem" varStatus="orderItemStat">
+                    <c:forEach items="${basketItems}" var="basketItem">
                         <tr>
-                            <td th:text="${orderItem.name}"></td>
+                        <input type="hidden" name="totalPrice[${basketItem.goods_id}]" value="${basketItem.price}" />
+                        <input type="hidden" name="item[${basketItem.goods_id}]" value="${basketItem.goods_id}" />
+                        <input type="hidden" name="quantity[${basketItem.goods_id}]"/>
+
+
+                            <td id="item-${basketItem.goods_id}">${basketItem.name}</td>
                             <td>
-                                <input id="input-${orderItem.goodsId}" type="number" min="0" max="${orderItem.quantity}" class="quantity-input" data-goodsid="${orderItem.goodsId}" data-price="${orderItem.price}" th:value="${orderItem.quantity}" th:name="orderItems[__${orderItemStat.index}__].quantity">
-                                <input type="hidden" th:name="orderItems[__${orderItemStat.index}__].goodsId" th:value="${orderItem.goodsId}">
-                                <input type="hidden" th:name="orderItems[__${orderItemStat.index}__].name" th:value="${orderItem.name}">
-                                <input type="hidden" th:name="orderItems[__${orderItemStat.index}__].price" th:value="${orderItem.price}">
+                                <input id="input-${basketItem.goods_id}" type="number" min="0" max="${basketItem.quantity}"
+                                class="quantity-input" data-goodsid="${basketItem.goods_id}" data-price="${basketItem.price}"
+                                value="0">
                             </td>
-                            <td id="single-price-${orderItem.goodsId}" data-priceSingle="${orderItem.price}" th:text="'$' + ${orderItem.price}"></td>
-                            <td id="total-price-${orderItem.goodsId}" class="total-price" th:text="'$' + (${orderItem.price} * ${orderItem.quantity})"></td>
-                            <td>
-                                <button class="btn btn-danger remove-btn" data-goodsid="${orderItem.goodsId}">Remove</button>
-                            </td>
+                            <td id="single-price-${basketItem.goods_id}" data-priceSingle="${basketItem.price}">$${basketItem.price}</td>
+                            <td id="total-price-${basketItem.goods_id}" class="total-price"></td>
+                            <td><button class="btn btn-danger remove-btn" data-goodsid="${basketItem.goods_id}">Remove</button></td>
                         </tr>
                     </c:forEach>
                 </tbody>
                 <tfoot>
                     <tr>
+                        <input type="hidden" name="summaryPrice" value="$${totalPrice}" />
                         <td colspan="3" class="text-right"><strong>Total:</strong></td>
-                        <td id="summary-price" name="summaryPrice"><strong>$${totalPrice}</strong>
-                        </td>
+                        <td id="summary-price"><strong>$${totalPrice}</strong></td>
                     </tr>
                 </tfoot>
             </table>
 
+
             <div class="form-group mt-3 mb-3">
-                <label for="payment-type">Payment Type:</label>
-                <select class="form-control" id="payment-type" name="paymentType" required>
-                    <option value="">Choose payment type</option>
-                    <option value="post-payment">Post-payment</option>
-                    <option value="online">Online</option>
-                </select>
+              <label for="payment-type">Payment Type:</label>
+              <select class="form-control" id="payment-type" name="paymentType" required>
+                <option value="">Choose payment type</option>
+                <option value="1">Post-payment</option>
+                <option value="2">Online</option>
+              </select>
             </div>
             <div class="form-group mt-3 mb-3">
-                <label for="address">Delivery Address:</label>
-                <input type="text" class="form-control" id="address" name="deliveryAddress" required>
+              <label for="address">Delivery Address:</label>
+              <input type="text" class="form-control" id="address" name="address" required>
             </div>
-            <button type="submit" class="btn btn-primary">Submit Order</button>
+            <button id="submit-btn" type="button" class="btn btn-primary">Submit Order</button>
         </form>
 	</div>
 	<script src="<c:url value='/resources/js/jquery-3.6.0.min.js'/>"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js" integrity="sha512-1/RvZTcCDEUjY/CypiMz+iqqtaoQfAITmNSJY17Myp4Ms5mdxPS5UV7iOfdZoxcGhzFbOm6sntTKJppjvuhg4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script defer>
+
+    function sendOrder() {
+      // Get form data
+      const form = document.getElementById('orderForm');
+      const formData = new FormData(form);
+
+      // Send data via AJAX
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'basket/submit');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          console.log(xhr.responseText);
+        } else {
+          console.error(xhr.statusText);
+        }
+      };
+      xhr.onerror = function() {
+        console.error(xhr.statusText);
+      };
+      xhr.send(formData);
+    }
+
+
     $(document).ready(function() {
+        const submitButton = document.querySelector('#orderForm button[type="button"]');
+        submitButton.addEventListener('click', sendOrder);
 
         $(".remove-btn").click(function() {
             var goodsId = $(this).data("goodsid");
@@ -111,6 +138,7 @@ pageEncoding="UTF-8"%>
         });
 
         $(".quantity-input").change(function() {
+
             var goodsId = $(this).data("goodsid");
             var quantity = quantity = $(this).val();;
             var price = $(this).data("price");
@@ -118,6 +146,17 @@ pageEncoding="UTF-8"%>
 
             var priceNode = document.querySelector(`#total-price-` + goodsId);
             var text = document.createTextNode("");
+
+            // Get the new value of the quantity input
+            const quantityInput = document.querySelector(`#input-` + goodsId);
+            const newValue = quantityInput.value;
+
+            // Set the value of the hidden input field
+            const hiddenInputQuantity = document.querySelector('input[name="quantity[' + goodsId + ']"]');
+            const hiddenInputTotalPrice = document.querySelector('input[name="totalPrice[' + goodsId + ']"]');
+            const hiddenInputSummaryPrice = document.querySelector('input[name="summaryPrice"]');
+
+            hiddenInputQuantity.value = newValue;
 
             while (priceNode.firstChild) {
               priceNode.removeChild(priceNode.firstChild);
@@ -128,6 +167,7 @@ pageEncoding="UTF-8"%>
             childNode.textContent = newPrice + "$";
 
             priceNode.dataset.priceTotal = newPrice;
+            hiddenInputTotalPrice.value = newPrice;
 
             //
             // getting total price of all products
@@ -147,7 +187,12 @@ pageEncoding="UTF-8"%>
 
             // Set the text content of the element with id "summary-price" to the total
             const summaryPriceElement = document.getElementById('summary-price');
+            hiddenInputSummaryPrice.value = total;
             summaryPriceElement.textContent = '$' + total.toFixed(2);
+        });
+
+        $("#submit-btn").click(function() {
+            sendOrder();
         });
     });
     </script>

@@ -3,7 +3,7 @@ package com.webite.crossplatform.entities;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "orders")
@@ -12,58 +12,52 @@ public class OrdersEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
-    private Long id;
+    private Integer id;
 
     @Column(name = "total_price")
-    private BigDecimal totalPrice;
+    private Double totalPrice;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_type_id")
-    private PaymentTypesEntity paymentType;
+    @Column(name = "payment_type_id")
+    private int paymentType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status_id")
-    private StatusesEntity status;
+    @Column(name = "status_id")
+    private int status;
 
+    @Column(name = "address")
     private String address;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinTable(
-            name = "orders_has_goods",
-            joinColumns = { @JoinColumn(name = "orders_order_id") },
-            inverseJoinColumns = { @JoinColumn(name = "goods_goods_id") }
-    )
-    private List<GoodsEntity> goods;
+    @OneToMany(mappedBy = "ordersEntity")
+    private List<OrdersHasGoodsEntity> ordersHasGoodsList;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public BigDecimal getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(BigDecimal totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
-    public PaymentTypesEntity getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(PaymentTypesEntity paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public StatusesEntity getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(StatusesEntity status) {
+    public int getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(int paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    public void setStatus(int status) {
         this.status = status;
     }
 
@@ -75,11 +69,11 @@ public class OrdersEntity {
         this.address = address;
     }
 
-    public List<GoodsEntity> getGoods() {
-        return goods;
+    public List<OrdersHasGoodsEntity> getOrdersHasGoodsList() {
+        return ordersHasGoodsList;
     }
 
-    public void setGoods(List<GoodsEntity> goods) {
-        this.goods = goods;
+    public void setOrdersHasGoodsList(List<OrdersHasGoodsEntity> ordersHasGoodsList) {
+        this.ordersHasGoodsList = ordersHasGoodsList;
     }
 }

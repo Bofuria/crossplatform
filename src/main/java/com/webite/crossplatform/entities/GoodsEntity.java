@@ -1,19 +1,28 @@
 package com.webite.crossplatform.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "goods")
 public class GoodsEntity {
 
     @Id
+    @Column(name = "goods_id")
     private int goods_id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "quantity")
     private int quantity;
+
+    @Column(name = "price")
     private int price;
+
+    @Column(name = "img")
     private byte[] img; // path to img
+
+    @Column(name = "description")
     private String description;
 
     public int getGoods_id() {
