@@ -6,6 +6,7 @@ import com.webite.crossplatform.dao.OrdersHasGoodsDao;
 import com.webite.crossplatform.entities.*;
 import jakarta.persistence.criteria.Order;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -60,7 +61,17 @@ public class basketController {
     }
 
     @PostMapping("/basket/submit")
-    public String submitOrder(HttpServletRequest request) {
+    public String submitOrder(HttpServletRequest request, HttpSession session) {
+
+        // check if order has already been submitted
+        if (session.getAttribute("orderSubmitted") != null) {
+            return "/index";
+        }
+
+        // set flag to indicate that order has been submitted
+        session.setAttribute("orderSubmitted", true);
+
+
         // get form data from request
         String paymentTypeStr = request.getParameter("paymentType");
         String address = request.getParameter("address");
@@ -104,7 +115,7 @@ public class basketController {
             }
         }
 
-        return "redirect:/index";
+        return "/index";
     }
 
     @Transactional

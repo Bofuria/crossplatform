@@ -106,7 +106,7 @@ pageEncoding="UTF-8"%>
       xhr.open('POST', 'basket/submit');
       xhr.onload = function() {
         if (xhr.status === 200) {
-          console.log(xhr.responseText);
+          window.location = '/index';
         } else {
           console.error(xhr.statusText);
         }
