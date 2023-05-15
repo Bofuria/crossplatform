@@ -22,16 +22,10 @@ pageEncoding="UTF-8"%>
             	<li class="nav-item">
             		<a class="nav-link" href="edit">Edit</a>
             	</li>
-            	<li class="nav-item">
-            		<a class="nav-link" href="orders">My orders</a>
-            	</li>
             	<li class="nav-item active">
                     <a class="nav-link" href="basket">Basket</a>
                 </li>
             </ul>
-		</div>
-		<div class="ml-auto">
-			<a class="btn btn-primary" href="cabinet">My cabinet</a>
 		</div>
 	</nav>
 	<div class="container mt-4">

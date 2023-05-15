@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-    public interface GoodsDao extends CrudRepository<GoodsEntity, Integer> { // TODO change Object to required type
+    public interface GoodsDao extends CrudRepository<GoodsEntity, Integer> {
 
     @Query(value = "SELECT * FROM goods ORDER BY goods_id DESC", nativeQuery = true)
     List<GoodsEntity> findAllGoods();
